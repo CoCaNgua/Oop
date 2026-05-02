@@ -5,7 +5,4 @@
 
 -> Slide: https://canva.link/76a6jfhn41r5cft
 
-## Cách Chạy code
--> g++ src/main.cpp -o main
 
--> ./main
