@@ -5,10 +5,6 @@
 
 -> Slide: https://canva.link/76a6jfhn41r5cft
 
-## 💻 Code
-👉 Xem code tại đây:  
-https://github.com/nguynthothanh/Oop/blob/main/src/main.cpp
-
 ## Cách Chạy code
 -> g++ src/main.cpp -o main
 
