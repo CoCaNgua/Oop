@@ -8,3 +8,8 @@
 ## 💻 Code
 👉 Xem code tại đây:  
 https://github.com/nguynthothanh/Oop/blob/main/src/main.cpp
+
+## Cách Chạy code
+-> g++ src/main.cpp -o main
+
+-> ./main
