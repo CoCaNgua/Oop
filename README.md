@@ -7,4 +7,4 @@
 
 ## 💻 Code
 👉 Xem code tại đây:  
-[https://github.com/username/Oop/blob/main/src/main.cpp](https://github.com/nguynthothanh/Oop/blob/main/src/main.cpp)
+https://github.com/nguynthothanh/Oop/blob/main/src/main.cpp
