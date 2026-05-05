@@ -1,11 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <ctime>
-#include <cstdlib>
-#include <algorithm>
 
-using namespace std;
 
 enum TrangThai { TRONG_CHUONG, TREN_BAN_CO, LEN_DOC, VE_DICH };
 enum MauSac { XANH_DUONG = 0, DO = 1, XANH_LA = 2, VANG = 3 };
