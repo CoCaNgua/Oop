@@ -1,4 +1,10 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <ctime>
+#include <cstdlib>
+#include <algorithm>
+
 using namespace std;
 
 enum TrangThai { TRONG_CHUONG, TREN_BAN_CO, LEN_DOC, VE_DICH };
