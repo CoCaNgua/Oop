@@ -6,7 +6,6 @@ Phân tích chiến lược trờ chơi cờ cá ngựa.
 -> Slide: https://canva.link/76a6jfhn41r5cft
 
 ## 📌Luật chơi
-LUẬT CHƠI
 1. Bàn cờ và Quân cờ
   - Cấu trúc: 4 màu (Xanh dương, Đỏ, Xanh lá, Vàng). Mỗi màu có 4 quân ngựa.
   - Lộ trình: 48 ô vòng tròn chung. Sau khi đi hết 1 vòng, ngựa tiến vào đường dẫn 6 ô bậc thang để về đích.
