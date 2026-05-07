@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <string>
 #include <ctime>
 #include <cstdlib>
@@ -7,19 +6,8 @@
 
 using namespace std;
 
-enum TrangThai {
-    TRONG_CHUONG,
-    TREN_BAN_CO,
-    LEN_DOC,
-    VE_DICH
-};
-
-enum MauSac {
-    XANH_DUONG = 0,
-    DO = 1,
-    XANH_LA = 2,
-    VANG = 3
-};
+enum TrangThai { TRONG_CHUONG, TREN_BAN_CO, LEN_DOC, VE_DICH };
+enum MauSac { XANH_DUONG = 0, DO = 1, XANH_LA = 2, VANG = 3 };
 
 class QuanCo {
 public:
@@ -38,13 +26,10 @@ public:
     }
 
     int layViTriBatDau() const {
-        switch (mau) {
-            case XANH_DUONG: return 0;
-            case DO: return 12;
-            case XANH_LA: return 24;
-            case VANG: return 36;
-        }
-        return 0;
+        if (mau == XANH_DUONG) return 0;
+        if (mau == DO) return 12;
+        if (mau == XANH_LA) return 24;
+        return 36;
     }
 };
 
@@ -52,12 +37,11 @@ class DieuKhienTroChoi;
 
 class ChienThuat {
 public:
-    virtual int chonNgua(
-        class NguoiChoi& p,
-        DieuKhienTroChoi& game,
-        int diemXucXac,
-        vector<int>& nguaHopLe
-    ) = 0;
+    virtual int chonNgua(class NguoiChoi& p,
+                         DieuKhienTroChoi& game,
+                         int dice,
+                         int* ds,
+                         int size) = 0;
 
     virtual string ten() = 0;
 
@@ -67,7 +51,7 @@ public:
 class NguoiChoi {
 public:
     MauSac mau;
-    vector<QuanCo> danhSachNgua;
+    QuanCo* danhSachNgua[4];
     ChienThuat* chienThuat;
     bool duocThemLuot;
     int soQuanVeDich;
@@ -79,7 +63,13 @@ public:
         soQuanVeDich = 0;
 
         for (int i = 0; i < 4; i++) {
-            danhSachNgua.push_back(QuanCo(m, i));
+            danhSachNgua[i] = new QuanCo(m, i);
+        }
+    }
+
+    ~NguoiChoi() {
+        for (int i = 0; i < 4; i++) {
+            delete danhSachNgua[i];
         }
     }
 };
@@ -95,163 +85,154 @@ public:
         }
     }
 
-    QuanCo* layQuanTai(int viTri) {
-        return banCo[viTri];
+    QuanCo* layQuanTai(int vt) {
+        if (vt >= 0 && vt < 48) return banCo[vt];
+        return nullptr;
     }
 
     bool biCanDuong(QuanCo& ngua, int soBuoc) {
-        if (ngua.trangThai != TREN_BAN_CO)
-            return false;
+        if (ngua.trangThai != TREN_BAN_CO) return false;
 
         for (int i = 1; i <= soBuoc; i++) {
+            int vtCheck = (ngua.viTri + i) % 48;
 
-            int viTriCheck = (ngua.viTri + i) % 48;
-
-            if (banCo[viTriCheck] != nullptr) {
+            if (banCo[vtCheck] != nullptr) {
 
                 if (i == soBuoc &&
-                    banCo[viTriCheck]->mau == ngua.mau)
+                    banCo[vtCheck]->mau == ngua.mau) {
                     return true;
+                }
 
-                if (i < soBuoc)
+                if (i < soBuoc) {
                     return true;
+                }
             }
         }
 
         return false;
     }
 
-    void xuLyDaNgua(
-        QuanCo& nguaTa,
-        int viTriMoi,
-        NguoiChoi& nguoiChoi
-    ) {
-        if (banCo[viTriMoi] != nullptr &&
-            banCo[viTriMoi]->mau != nguaTa.mau)
-        {
-            QuanCo* biDa = banCo[viTriMoi];
+    void xuLyDaNgua(QuanCo& ta, int vtMoi, NguoiChoi& p) {
+
+        if (vtMoi >= 0 &&
+            vtMoi < 48 &&
+            banCo[vtMoi] != nullptr &&
+            banCo[vtMoi]->mau != ta.mau) {
+
+            QuanCo* biDa = banCo[vtMoi];
 
             biDa->trangThai = TRONG_CHUONG;
             biDa->viTri = -1;
             biDa->quangDuongDaDi = 0;
 
-            nguoiChoi.duocThemLuot = true;
+            p.duocThemLuot = true;
         }
     }
 
-    vector<int> layDanhSachHopLe(
-        NguoiChoi& p,
-        int diemXucXac
-    ) {
-        vector<int> ds;
+    int layDanhSachHopLe(NguoiChoi& p,
+                         int dice,
+                         int* ds) {
+
+        int count = 0;
 
         for (int i = 0; i < 4; i++) {
 
-            QuanCo& ngua = p.danhSachNgua[i];
+            QuanCo& n = *p.danhSachNgua[i];
 
-            if (ngua.trangThai == VE_DICH)
-                continue;
+            if (n.trangThai == VE_DICH) continue;
 
-            if (ngua.trangThai == TRONG_CHUONG) {
+            if (n.trangThai == TRONG_CHUONG) {
 
-                if (diemXucXac == 6) {
+                if (dice == 6) {
 
-                    int start = ngua.layViTriBatDau();
+                    int start = n.layViTriBatDau();
 
                     if (banCo[start] == nullptr ||
-                        banCo[start]->mau != ngua.mau)
-                    {
-                        ds.push_back(i);
+                        banCo[start]->mau != n.mau) {
+
+                        ds[count++] = i;
                     }
                 }
             }
 
-            else if (ngua.trangThai == TREN_BAN_CO) {
+            else {
 
-                if (!biCanDuong(ngua, diemXucXac)) {
-                    ds.push_back(i);
-                }
-            }
+                int qdMoi = n.quangDuongDaDi + dice;
 
-            else if (ngua.trangThai == LEN_DOC) {
+                if (qdMoi <= 54) {
 
-                if (diemXucXac == ngua.viTri + 1) {
-                    ds.push_back(i);
+                    if (n.trangThai == TREN_BAN_CO) {
+
+                        if (!biCanDuong(n, dice)) {
+                            ds[count++] = i;
+                        }
+                    }
+                    else {
+                        ds[count++] = i;
+                    }
                 }
             }
         }
 
-        return ds;
+        return count;
     }
 
-    void diChuyen(
-        NguoiChoi& p,
-        int indexNgua,
-        int diemXucXac
-    ) {
-        QuanCo& ngua = p.danhSachNgua[indexNgua];
+    void diChuyen(NguoiChoi& p,
+                  int idx,
+                  int dice) {
 
-        if (ngua.trangThai == TRONG_CHUONG) {
+        QuanCo& n = *p.danhSachNgua[idx];
 
-            int start = ngua.layViTriBatDau();
+        if (n.trangThai == TRONG_CHUONG) {
 
-            xuLyDaNgua(ngua, start, p);
+            int start = n.layViTriBatDau();
 
-            ngua.trangThai = TREN_BAN_CO;
-            ngua.viTri = start;
-            ngua.quangDuongDaDi = 0;
+            xuLyDaNgua(n, start, p);
 
-            banCo[start] = &ngua;
+            n.trangThai = TREN_BAN_CO;
+            n.viTri = start;
+            n.quangDuongDaDi = 1;
 
-            return;
-        }
-
-        if (ngua.trangThai == TREN_BAN_CO) {
-
-            banCo[ngua.viTri] = nullptr;
-
-            if (ngua.quangDuongDaDi + diemXucXac > 48) {
-
-                banCo[ngua.viTri] = &ngua;
-                return;
-            }
-
-            if (ngua.quangDuongDaDi + diemXucXac == 48) {
-
-                ngua.trangThai = LEN_DOC;
-                ngua.viTri = 0;
-
-                return;
-            }
-
-            int viTriMoi =
-                (ngua.viTri + diemXucXac) % 48;
-
-            xuLyDaNgua(ngua, viTriMoi, p);
-
-            ngua.viTri = viTriMoi;
-            ngua.quangDuongDaDi += diemXucXac;
-
-            banCo[viTriMoi] = &ngua;
+            banCo[start] = &n;
 
             return;
         }
 
-        if (ngua.trangThai == LEN_DOC) {
+        if (n.trangThai == TREN_BAN_CO) {
+            banCo[n.viTri] = nullptr;
+        }
 
-            if (diemXucXac == ngua.viTri + 1) {
+        int qdMoi = n.quangDuongDaDi + dice;
 
-                ngua.viTri++;
+        n.quangDuongDaDi = qdMoi;
 
-                if (ngua.viTri == 6) {
+        if (qdMoi < 48) {
 
-                    ngua.trangThai = VE_DICH;
+            int vtMoi = (n.viTri + dice) % 48;
 
-                    p.soQuanVeDich++;
+            xuLyDaNgua(n, vtMoi, p);
 
-                    p.duocThemLuot = true;
-                }
-            }
+            n.viTri = vtMoi;
+
+            banCo[vtMoi] = &n;
+        }
+
+        else if (qdMoi < 54) {
+
+            n.trangThai = LEN_DOC;
+
+            n.viTri = qdMoi - 47;
+        }
+
+        else if (qdMoi == 54) {
+
+            n.trangThai = VE_DICH;
+
+            n.viTri = 100;
+
+            p.soQuanVeDich++;
+
+            p.duocThemLuot = true;
         }
     }
 };
@@ -263,40 +244,38 @@ public:
         return "Hung Hang";
     }
 
-    int chonNgua(
-        NguoiChoi& p,
-        DieuKhienTroChoi& game,
-        int diemXucXac,
-        vector<int>& ds
-    ) override {
+    int chonNgua(NguoiChoi& p,
+                 DieuKhienTroChoi& game,
+                 int dice,
+                 int* ds,
+                 int size) override {
 
-        for (int idx : ds) {
+        for (int i = 0; i < size; i++) {
 
-            QuanCo& n = p.danhSachNgua[idx];
+            QuanCo& n = *p.danhSachNgua[ds[i]];
 
             if (n.trangThai == TREN_BAN_CO) {
 
-                int vMoi =
-                    (n.viTri + diemXucXac) % 48;
+                int vtMoi = (n.viTri + dice) % 48;
 
-                QuanCo* q = game.layQuanTai(vMoi);
+                QuanCo* q = game.layQuanTai(vtMoi);
 
                 if (q != nullptr &&
-                    q->mau != n.mau)
-                {
-                    return idx;
+                    q->mau != n.mau) {
+
+                    return ds[i];
                 }
             }
         }
 
         int best = ds[0];
 
-        for (int idx : ds) {
+        for (int i = 1; i < size; i++) {
 
-            if (p.danhSachNgua[idx].quangDuongDaDi >
-                p.danhSachNgua[best].quangDuongDaDi)
-            {
-                best = idx;
+            if (p.danhSachNgua[ds[i]]->quangDuongDaDi >
+                p.danhSachNgua[best]->quangDuongDaDi) {
+
+                best = ds[i];
             }
         }
 
@@ -311,21 +290,20 @@ public:
         return "Uu Tien Ve Dich";
     }
 
-    int chonNgua(
-        NguoiChoi& p,
-        DieuKhienTroChoi& game,
-        int diemXucXac,
-        vector<int>& ds
-    ) override {
+    int chonNgua(NguoiChoi& p,
+                 DieuKhienTroChoi& game,
+                 int dice,
+                 int* ds,
+                 int size) override {
 
         int best = ds[0];
 
-        for (int idx : ds) {
+        for (int i = 1; i < size; i++) {
 
-            if (p.danhSachNgua[idx].quangDuongDaDi >
-                p.danhSachNgua[best].quangDuongDaDi)
-            {
-                best = idx;
+            if (p.danhSachNgua[ds[i]]->quangDuongDaDi >
+                p.danhSachNgua[best]->quangDuongDaDi) {
+
+                best = ds[i];
             }
         }
 
@@ -340,34 +318,36 @@ public:
         return "Dan Quan";
     }
 
-    int chonNgua(
-        NguoiChoi& p,
-        DieuKhienTroChoi& game,
-        int diemXucXac,
-        vector<int>& ds
-    ) override {
+    int chonNgua(NguoiChoi& p,
+                 DieuKhienTroChoi& game,
+                 int dice,
+                 int* ds,
+                 int size) override {
 
-        if (diemXucXac == 6) {
+        if (dice == 6) {
 
-            for (int idx : ds) {
+            for (int i = 0; i < size; i++) {
 
-                if (p.danhSachNgua[idx].trangThai
-                    == TRONG_CHUONG)
-                {
-                    return idx;
+                QuanCo& n = *p.danhSachNgua[ds[i]];
+
+                if (n.trangThai == TRONG_CHUONG) {
+                    return ds[i];
                 }
             }
         }
 
-        sort(ds.begin(), ds.end(),
-            [&](int a, int b)
-            {
-                return p.danhSachNgua[a].quangDuongDaDi
-                    <
-                    p.danhSachNgua[b].quangDuongDaDi;
-            });
+        int best = ds[0];
 
-        return ds[0];
+        for (int i = 1; i < size; i++) {
+
+            if (p.danhSachNgua[ds[i]]->quangDuongDaDi <
+                p.danhSachNgua[best]->quangDuongDaDi) {
+
+                best = ds[i];
+            }
+        }
+
+        return best;
     }
 };
 
@@ -378,14 +358,13 @@ public:
         return "Ngau Nhien";
     }
 
-    int chonNgua(
-        NguoiChoi& p,
-        DieuKhienTroChoi& game,
-        int diemXucXac,
-        vector<int>& ds
-    ) override {
+    int chonNgua(NguoiChoi& p,
+                 DieuKhienTroChoi& game,
+                 int dice,
+                 int* ds,
+                 int size) override {
 
-        return ds[rand() % ds.size()];
+        return ds[rand() % size];
     }
 };
 
@@ -394,108 +373,97 @@ int main() {
     srand(time(0));
 
     int n;
+
     cin >> n;
 
-    int win1 = 0;
-    int win2 = 0;
-    int win3 = 0;
-    int win4 = 0;
+    int wins[4] = {0, 0, 0, 0};
 
     HungHang ct1;
     UuTienVeDich ct2;
     DanQuan ct3;
     NgauNhien ct4;
 
-    while (n--) {
+    for (int v = 0; v < n; v++) {
 
         DieuKhienTroChoi game;
 
-        vector<NguoiChoi> players;
+        NguoiChoi* players[4];
 
-        players.push_back(
-            NguoiChoi(XANH_DUONG, &ct1));
+        players[0] = new NguoiChoi(XANH_DUONG, &ct1);
+        players[1] = new NguoiChoi(DO, &ct2);
+        players[2] = new NguoiChoi(XANH_LA, &ct3);
+        players[3] = new NguoiChoi(VANG, &ct4);
 
-        players.push_back(
-            NguoiChoi(DO, &ct2));
+        bool running = true;
 
-        players.push_back(
-            NguoiChoi(XANH_LA, &ct3));
+        while (running) {
 
-        players.push_back(
-            NguoiChoi(VANG, &ct4));
-
-        bool gameRunning = true;
-
-        while (gameRunning) {
-
-            for (auto& p : players) {
+            for (int j = 0; j < 4; j++) {
 
                 bool tiepTuc = true;
 
                 while (tiepTuc) {
 
-                    p.duocThemLuot = false;
+                    players[j]->duocThemLuot = false;
 
-                    int xucXac =
-                        rand() % 6 + 1;
+                    int dice = rand() % 6 + 1;
 
-                    if (xucXac == 6)
-                        p.duocThemLuot = true;
+                    if (dice == 6) {
+                        players[j]->duocThemLuot = true;
+                    }
 
-                    vector<int> dsHopLe =
+                    int ds[4];
+
+                    int size =
                         game.layDanhSachHopLe(
-                            p,
-                            xucXac
+                            *players[j],
+                            dice,
+                            ds
                         );
 
-                    if (!dsHopLe.empty()) {
+                    if (size > 0) {
 
-                        int idx =
-                            p.chienThuat->chonNgua(
-                                p,
+                        int choice =
+                            players[j]->chienThuat->chonNgua(
+                                *players[j],
                                 game,
-                                xucXac,
-                                dsHopLe
+                                dice,
+                                ds,
+                                size
                             );
 
                         game.diChuyen(
-                            p,
-                            idx,
-                            xucXac
+                            *players[j],
+                            choice,
+                            dice
                         );
                     }
 
-                    if (p.soQuanVeDich == 4) {
+                    if (players[j]->soQuanVeDich == 4) {
 
-                        if (p.mau == XANH_DUONG)
-                            win1++;
+                        wins[j]++;
 
-                        else if (p.mau == DO)
-                            win2++;
+                        running = false;
 
-                        else if (p.mau == XANH_LA)
-                            win3++;
-
-                        else
-                            win4++;
-
-                        gameRunning = false;
                         break;
                     }
 
-                    tiepTuc = p.duocThemLuot;
+                    tiepTuc = players[j]->duocThemLuot;
                 }
 
-                if (!gameRunning)
-                    break;
+                if (!running) break;
             }
+        }
+
+        for (int j = 0; j < 4; j++) {
+            delete players[j];
         }
     }
 
-    cout << "Hung Hang: " << win1 << endl;
-    cout << "Uu Tien Ve Dich: " << win2 << endl;
-    cout << "Dan Quan: " << win3 << endl;
-    cout << "Ngau Nhien: " << win4 << endl;
+    cout << "Hung Hang: " << wins[0] << endl;
+    cout << "Uu Tien Ve Dich: " << wins[1] << endl;
+    cout << "Dan Quan: " << wins[2] << endl;
+    cout << "Ngau Nhien: " << wins[3] << endl;
 
     return 0;
 }
