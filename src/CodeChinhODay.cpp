@@ -66,7 +66,6 @@ public:
             banCo[i] = nullptr;
         }
     }
-
     QuanCo* layQuanTai(int vt) {
         if (vt >= 0 && vt < 48) return banCo[vt];
         return nullptr;
