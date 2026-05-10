@@ -3,7 +3,7 @@
 ## 📌 Giới thiệu
 Phân tích chiến lược trờ chơi cờ cá ngựa.
 
--> Slide: https://canva.link/76a6jfhn41r5cft
+-> Slide: 
 
 ## 📌Luật chơi
 1. Bàn cờ và Quân cờ
