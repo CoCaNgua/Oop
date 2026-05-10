@@ -98,9 +98,7 @@ public:
         int count = 0;
         for (int i = 0; i < 4; i++) {
             QuanCo& n = *p.danhSachNgua[i];
-
             if (n.trangThai == VE_DICH) continue;
-
             if (n.trangThai == TRONG_CHUONG) {
                 if (dice == 6) {
                     int start = n.layViTriBatDau();
@@ -121,28 +119,22 @@ public:
         }
         return count;
     }
-
     void diChuyen(NguoiChoi& p, int idx, int dice) {
         QuanCo& n = *p.danhSachNgua[idx];
-
         if (n.trangThai == TRONG_CHUONG) {
             int start = n.layViTriBatDau();
             xuLyDaNgua(n, start, p);
-
             n.trangThai = TREN_BAN_CO;
             n.viTri = start;
             n.quangDuongDaDi = 1;
             banCo[start] = &n;
             return;
         }
-
         if (n.trangThai == TREN_BAN_CO) {
             banCo[n.viTri] = nullptr;
         }
-
         int qdMoi = n.quangDuongDaDi + dice;
         n.quangDuongDaDi = qdMoi;
-
         if (qdMoi < 48) {
             int vtMoi = (n.viTri + dice) % 48;
             xuLyDaNgua(n, vtMoi, p);
