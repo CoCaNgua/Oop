@@ -158,7 +158,6 @@ public:
 class HungHang : public ChienThuat {
 public:
     string ten() override { return "Hung Hang"; }
-
     int chonNgua(NguoiChoi& p, DieuKhienTroChoi& game, int dice, int* ds, int size) override {
         for (int i = 0; i < size; i++) {
             QuanCo& n = *p.danhSachNgua[ds[i]];
@@ -168,7 +167,6 @@ public:
                 if (q != nullptr && q->mau != n.mau) return ds[i];
             }
         }
-
         int best = ds[0];
         for (int i = 1; i < size; i++) {
             if (p.danhSachNgua[ds[i]]->quangDuongDaDi > p.danhSachNgua[best]->quangDuongDaDi) {
@@ -182,7 +180,6 @@ public:
 class UuTienVeDich : public ChienThuat {
 public:
     string ten() override { return "Uu Tien Ve Dich"; }
-
     int chonNgua(NguoiChoi& p, DieuKhienTroChoi& game, int dice, int* ds, int size) override {
         int best = ds[0];
         for (int i = 1; i < size; i++) {
@@ -197,14 +194,12 @@ public:
 class DanQuan : public ChienThuat {
 public:
     string ten() override { return "Dan Quan"; }
-
     int chonNgua(NguoiChoi& p, DieuKhienTroChoi& game, int dice, int* ds, int size) override {
         if (dice == 6) {
             for (int i = 0; i < size; i++) {
                 if (p.danhSachNgua[ds[i]]->trangThai == TRONG_CHUONG) return ds[i];
             }
         }
-
         int best = ds[0];
         for (int i = 1; i < size; i++) {
             if (p.danhSachNgua[ds[i]]->quangDuongDaDi < p.danhSachNgua[best]->quangDuongDaDi) {
@@ -218,7 +213,6 @@ public:
 class NgauNhien : public ChienThuat {
 public:
     string ten() override { return "Ngau Nhien"; }
-
     int chonNgua(NguoiChoi& p, DieuKhienTroChoi& game, int dice, int* ds, int size) override {
         return ds[rand() % size];
     }
