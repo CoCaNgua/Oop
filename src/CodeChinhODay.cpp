@@ -210,11 +210,96 @@ public:
     }
 };
 
-class NgauNhien : public ChienThuat {
+class ChienThuatCanBang : public ChienThuat {
 public:
-    string ten() override { return "Ngau Nhien"; }
-    int chonNgua(NguoiChoi& p, DieuKhienTroChoi& game, int dice, int* ds, int size) override {
-        return ds[rand() % size];
+
+    string ten() override {
+        return "Can Bang";
+    }
+
+    int chonNgua(NguoiChoi& p,
+                 DieuKhienTroChoi& game,
+                 int dice,
+                 int* ds,
+                 int size) override {
+
+        if (dice == 6) {
+
+            for (int i = 0; i < size; i++) {
+
+                QuanCo& n = *p.danhSachNgua[ds[i]];
+
+                if (n.trangThai == TRONG_CHUONG) {
+                    return ds[i];
+                }
+            }
+
+            for (int i = 0; i < size; i++) {
+
+                QuanCo& n = *p.danhSachNgua[ds[i]];
+
+                if (n.trangThai == TREN_BAN_CO) {
+
+                    int vtMoi =
+                        (n.viTri + dice) % 48;
+
+                    QuanCo* q =
+                        game.layQuanTai(vtMoi);
+
+                    if (q != nullptr &&
+                        q->mau != n.mau) {
+
+                        return ds[i];
+                    }
+                }
+            }
+            int best = ds[0];
+
+            for (int i = 1; i < size; i++) {
+
+                if (p.danhSachNgua[ds[i]]
+                    ->quangDuongDaDi >
+
+                    p.danhSachNgua[best]
+                    ->quangDuongDaDi) {
+
+                    best = ds[i];
+                }
+            }
+            return best;
+        }
+        for (int i = 0; i < size; i++) {
+
+            QuanCo& n = *p.danhSachNgua[ds[i]];
+
+            if (n.trangThai == TREN_BAN_CO) {
+
+                int vtMoi =
+                    (n.viTri + dice) % 48;
+
+                QuanCo* q =
+                    game.layQuanTai(vtMoi);
+
+                if (q != nullptr &&
+                    q->mau != n.mau) {
+
+                    return ds[i];
+                }
+            }
+        }
+        int best = ds[0];
+        for (int i = 1; i < size; i++) {
+            if (p.danhSachNgua[ds[i]]
+                ->quangDuongDaDi >
+
+                p.danhSachNgua[best]
+                ->quangDuongDaDi) {
+
+                best = ds[i];
+            }
+        }
+
+        return best;
     }
 };
 
@@ -229,7 +314,7 @@ int main() {
     HungHang ct1;
     UuTienVeDich ct2;
     DanQuan ct3;
-    NgauNhien ct4;
+    ChienThuatCanBang ct4;
 
     for (int v = 0; v < n; v++) {
         DieuKhienTroChoi game;
@@ -280,8 +365,7 @@ int main() {
     cout << "Hung Hang: " << wins[0] << endl;
     cout << "Uu Tien Ve Dich: " << wins[1] << endl;
     cout << "Dan Quan: " << wins[2] << endl;
-    cout << "Ngau Nhien: " << wins[3] << endl;
+    cout << "Chien Thuat Can Bang: " << wins[3] << endl;
 
     return 0;
 }
-
