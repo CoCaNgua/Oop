@@ -33,8 +33,8 @@ Phân tích chiến lược trờ chơi cờ cá ngựa.
   - Ưu tiên: Luôn di chuyển con ngựa ở vị trí thấp nhất (gần điểm xuất phát nhất).
   - Lý do: Giữ đội hình san sát nhau để tạo rào chắn, khiến đối thủ phía sau không thể đi xuyên qua.
   - Đặc điểm: Chơi chắc chắn, phòng thủ tốt, đợi đối thủ sơ hở để đá.
-4. Chiến thuật "Ngẫu nhiên" (Random)
-  - Ưu tiên: Chọn đại một con ngựa bất kỳ có thể đi.
-  - Lý do: Dùng làm nhóm đối chứng để so sánh sức mạnh của 3 chiến thuật trên.
+4. Chiến thuật "Cân Bằng"
+  - Ưu tiên ra quân nhiều nhất (Nếu có thể).
+  - Nếu không thể ra quân thì ưu tiên đá quân. Còn nếu không thể đá quân thì đi quân đã đi được xa nhất.
 
 
